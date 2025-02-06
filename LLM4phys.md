@@ -1,0 +1,337 @@
+- [给 LLM 投喂物理知识](#给-llm-投喂物理知识)
+  - [常用的方案](#常用的方案)
+  - [可行的方案](#可行的方案)
+    - [GraphRAG](#graphrag)
+    - [Fine-tuning](#fine-tuning)
+- [CCNU NSC3 集群 vLLM 本地部署 DeepSeek-R1](#ccnu-nsc3-集群-vllm-本地部署-deepseek-r1)
+  - [vLLM 简介](#vllm-简介)
+  - [环境准备](#环境准备)
+  - [模型下载](#模型下载)
+  - [**代码准备**](#代码准备)
+    - [**Python脚本**](#python脚本)
+    - [创建兼容 OpenAI API 接口的服务器](#创建兼容-openai-api-接口的服务器)
+  - [推理速度测试](#推理速度测试)
+- [Reference](#reference)
+
+
+# 给 LLM 投喂物理知识
+
+## 常用的方案
+给大语言模型投喂 Lattice QCD 知识库，通常有如下三种方式：提示词（Prompt），检索增强生成（Retrieval-Augmented Generation，RAG），微调（Fine-tuning）。
+
+三种方式的实现原理对比：
+![](./figs/LLM4phys/schematic3ways.png)
+
+三种方式的优缺点对比：
+![](./figs/LLM4phys/compare3ways.png)
+
+图表来自：
+【如何给大模型喂数据？让AI更懂你～【小白科普】】 https://www.bilibili.com/video/BV1HS421R7oL/?share_source=copy_web&vd_source=4b438f829d0c01700eb6160fae7d5ea7
+
+## 可行的方案
+
+提示词的方式通常只支持128k上下文，显然没法胜任海量的知识库，剩下两种方式检索增强生成和微调倒是可行的。
+
+### GraphRAG
+
+本地安装微软开源 GraphRAG。GraphRAG优于传统的RAG，应该能够胜任对格点QCD知识的整理。
+
+- 优点是可以直接调用deepseek R1的API，性能强劲且便宜。
+- 缺点是微软的GraphRAG只支持txt和csv的文件格式。对于公式也是当作文本来处理，图片并不支持，需要预先处理，提取出图片中的文本信息。
+
+### Fine-tuning
+
+微调最大的困难在于数据准备，步骤如下：
+1. 收集物理领域数据：收集与特定物理领域相关的高质量数据，如物理学术论文、教科书、实验报告等。确保数据涵盖目标物理领域的核心概念和术语。
+2. 数据清洗和标注：对收集到的数据进行清洗，去除噪声和不相关的信息。根据需要对数据进行标注，例如标注物理公式、概念解释、实验步骤等。
+3. 数据格式化：将数据转换为模型可接受的格式，如JSONL文件，包含成对的问题和回答。
+
+准备好了用于微调的数据，还要在本地部署deepseek R1，能够本地部署的都是Qwen模型蒸馏deepseek R1得到的，性能远不如deepseek R1。
+
+
+# CCNU NSC3 集群 vLLM 本地部署 DeepSeek-R1
+
+## vLLM 简介
+
+`vLLM` 框架是一个高效的大语言模型**推理和部署服务系统**，具备以下特性：
+
+- **高效的内存管理**：通过 `PagedAttention` 算法，`vLLM` 实现了对 `KV` 缓存的高效管理，减少了内存浪费，优化了模型的运行效率。
+- **高吞吐量**：`vLLM` 支持异步处理和连续批处理请求，显著提高了模型推理的吞吐量，加速了文本生成和处理速度。
+- **易用性**：`vLLM` 与 `HuggingFace` 模型无缝集成，支持多种流行的大型语言模型，简化了模型部署和推理的过程。兼容 `OpenAI` 的 `API` 服务器。
+- **分布式推理**：框架支持在多 `GPU` 环境中进行分布式推理，通过模型并行策略和高效的数据通信，提升了处理大型模型的能力。
+- **开源共享**：`vLLM` 由于其开源的属性，拥有活跃的社区支持，这也便于开发者贡献和改进，共同推动技术发展。
+
+## 环境准备  
+
+本文基础环境如下：
+
+```
+----------------
+Centos 7.7
+python 3.12
+cuda 12.4
+CUDA DRIVER 550.54.14
+pytorch 2.5.1
+gcc 11
+g++ 11
+----------------
+```
+
+```bash
+# make a virtual environment first
+conda create -n cuda124_vllm python=3.12 -y
+module load cuda-12.4
+conda activate cuda124_vllm
+conda install -c conda-forge gcc=11
+conda install -c conda-forge gxx=11
+pip install torch
+pip install vllm
+```
+## 模型下载
+
+使用 modelscope 中的 snapshot_download 函数下载模型，第一个参数为模型名称，参数 cache_dir 为模型的下载路径。
+
+新建 `model_download.py` 文件并在其中输入以下内容，粘贴代码后记得保存文件。
+
+```python
+from modelscope import snapshot_download
+
+model_dir = snapshot_download('deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B', cache_dir='/dssg/work/kfye/deepseek', revision='master')
+```
+
+然后在终端中输入 `python model_download.py` 执行下载，这里需要耐心等待一段时间直到模型下载完成。
+
+> 注意：记得修改 `cache_dir` 为你的模型下载路径哦~
+
+
+## **代码准备**
+
+### **Python脚本**
+
+新建 `vllm_model.py` 文件并在其中输入以下内容，粘贴代码后请及时保存文件。下面的代码有很详细的注释，如有不理解的地方，欢迎大家提 `issue`。
+
+首先从 `vLLM` 库中导入 `LLM` 和 `SamplingParams` 类。`LLM` 类是使用 `vLLM` 引擎运行离线推理的主要类。`SamplingParams` 类指定采样过程的参数，用于控制和调整生成文本的随机性和多样性。
+
+`vLLM` 提供了非常方便的封装，我们直接传入模型名称或模型路径即可，不必手动初始化模型和分词器。
+
+我们可以通过这个代码示例熟悉下 ` vLLM` 引擎的使用方式。被注释的部分内容可以丰富模型的能力，但不是必要的，大家可以按需选择，自己多多动手尝试 ~
+
+```python
+# vllm_model.py
+from vllm import LLM, SamplingParams
+from transformers import AutoTokenizer
+import os
+import json
+
+# 自动下载模型时，指定使用modelscope; 否则，会从HuggingFace下载
+os.environ['VLLM_USE_MODELSCOPE']='True'
+
+def get_completion(prompts, model, tokenizer=None, max_tokens=8192, temperature=0.6, top_p=0.95, max_model_len=2048):
+    stop_token_ids = [151329, 151336, 151338]
+    # 创建采样参数。temperature 控制生成文本的多样性，top_p 控制核心采样的概率
+    sampling_params = SamplingParams(temperature=temperature, top_p=top_p, max_tokens=max_tokens, stop_token_ids=stop_token_ids)
+    # 初始化 vLLM 推理引擎
+    llm = LLM(model=model, tokenizer=tokenizer, max_model_len=max_model_len,trust_remote_code=True)
+    outputs = llm.generate(prompts, sampling_params)
+    return outputs
+
+
+if __name__ == "__main__":    
+    # 初始化 vLLM 推理引擎
+    model='/dssg/work/kfye/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B' # 指定模型路径
+    # model="deepseek-ai/DeepSeek-R1-Distill-Qwen-7B" # 指定模型名称，自动下载模型
+    tokenizer = None
+    # 加载分词器后传入vLLM 模型，但不是必要的。
+    # tokenizer = AutoTokenizer.from_pretrained(model, use_fast=False) 
+    
+    text = ["Please introduce Pade approximants for me. Please reason step by step, and put your final answer within \boxed{}.<think>\n", ] # 可用 List 同时传入多个 prompt，根据 DeepSeek 官方的建议，每个 prompt 都需要以 <think>\n 结尾，如果是数学推理内容，建议包含（中英文皆可）：Please reason step by step, and put your final answer within \boxed{}.
+
+    # messages = [
+    #     {"role": "user", "content": prompt+"<think>\n"}
+    # ]
+    # 作为聊天模板的消息，不是必要的。
+    # text = tokenizer.apply_chat_template(
+    #     messages,
+    #     tokenize=False,
+    #     add_generation_prompt=True
+    # )
+
+    outputs = get_completion(text, model, tokenizer=tokenizer, max_tokens=8192, temperature=0.6, top_p=0.95, max_model_len=2048) # 思考需要输出更多的 Token 数，max_tokens 设为 8K，根据 DeepSeek 官方的建议，temperature应在 0.5-0.7，推荐 0.6
+
+    # 输出是一个包含 prompt、生成文本和其他信息的 RequestOutput 对象列表。
+    # 打印输出。
+    for output in outputs:
+        prompt = output.prompt
+        generated_text = output.outputs[0].text
+        if r"</think>" in generated_text:
+            think_content, answer_content = generated_text.split(r"</think>")
+        else:
+            think_content = ""
+            answer_content = generated_text
+        print(f"Prompt: {prompt!r}, Think: {think_content!r}, Answer: {answer_content!r}")
+```
+运行代码
+
+```bash
+python vllm_model.py
+```
+
+### 创建兼容 OpenAI API 接口的服务器
+
+`DeepSeek-R1-Distill-Qwen` 兼容 `OpenAI API` 协议，所以我们可以直接使用 `vLLM` 创建 `OpenAI API` 服务器。`vLLM` 部署实现 `OpenAI API` 协议的服务器非常方便。默认会在 http://localhost:8000 启动服务器。服务器当前一次托管一个模型，并实现列表模型、`completions` 和 `chat completions` 端口。
+
+- `completions`：是基本的文本生成任务，模型会在给定的提示后生成一段文本。这种类型的任务通常用于生成文章、故事、邮件等。
+- `chat completions`：是面向对话的任务，模型需要理解和生成对话。这种类型的任务通常用于构建聊天机器人或者对话系统。
+
+在创建服务器时，我们可以指定模型名称、模型路径、聊天模板等参数。
+
+- `--host` 和 `--port` 参数指定地址。
+- `--model` 参数指定模型名称。
+- `--chat-template` 参数指定聊天模板。
+- `--served-model-name` 指定服务模型的名称。
+- `--max-model-len` 指定模型的最大长度。
+
+
+```bash
+conda activate cuda124_vllm
+python -m vllm.entrypoints.openai.api_server --model /dssg/work/kfye/deepseek/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --served-model-name deepseek-qwen-1.5b --tensor-parallel-size 8 --max-model-len 2048
+```
+
+- 通过 `curl` 命令查看当前的模型列表
+
+```bash
+curl http://localhost:8000/v1/models
+```
+
+- 使用 `curl` 命令测试 `OpenAI Completions API` 
+
+
+```bash
+curl http://localhost:8000/v1/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "model": "DeepSeek-R1-Distill-Qwen-7B",
+        "prompt": "我想问你，5的阶乘是多少？<think>\n",
+        "max_tokens": 1024,
+        "temperature": 0
+    }'
+```
+
+
+- 用 `Python` 脚本请求 `OpenAI Completions API` 
+
+
+```python
+# vllm_openai_completions.py
+from openai import OpenAI
+client = OpenAI(
+    base_url="http://localhost:8000/v1",
+    api_key="empty", # 随便填写，只是为了通过接口参数校验
+)
+
+completion = client.chat.completions.create(
+  model="deepseek-qwen-1.5b",
+  messages=[
+    {"role": "user", "content": "我想问你，5的阶乘是多少？<think>\n"}
+  ]
+)
+
+print(completion.choices[0].message)
+```
+
+```shell
+python vllm_openai_completions.py
+```
+
+- `request`方式
+
+```python
+# chat_vllm_api.py
+import requests
+
+headers = {
+    "Content-Type": "application/json",
+}
+
+URL = "http://localhost:8000/v1/chat/completions"
+
+prompt = {
+    "model": "deepseek-qwen-1.5b",
+    "messages": [
+        {"role": "system", "content": "You are a large model that excels at mathematical and physical reasoning."},
+        {"role": "user", "content": "Please introduce Pade approximants for me. Please reason step by step, and put your final answer within \boxed{}."}
+    ],
+    "temperature": 0.6,
+    "top_p": 0.95
+}
+
+resp = requests.post(URL, headers=headers, json=prompt, stream=False)
+rep = resp.json()
+print(rep)
+```
+
+
+- 用 `Python` 脚本请求 `OpenAI Chat Completions API` 
+
+
+```python
+# vllm_openai_chat_completions.py
+from openai import OpenAI
+openai_api_key = "empty" # 随便填写，只是为了通过接口参数校验
+openai_api_base = "http://localhost:8000/v1"
+
+client = OpenAI(
+    api_key=openai_api_key,
+    base_url=openai_api_base,
+)
+
+chat_outputs = client.chat.completions.create(
+    model="deepseek-qwen-1.5b",
+    messages=[
+        {"role": "user", "content": "什么是深度学习？"},
+    ]
+)
+print(chat_outputs)
+```
+
+```shell
+python vllm_openai_chat_completions.py
+```
+
+## 推理速度测试
+
+既然 `vLLM` 是一个高效的大型语言模型推理和部署服务系统，那么我们不妨就测试一下模型的回复生成速度。看看和原始的速度相比有多大的提升。这里直接使用 `vLLM` 自带的 `benchmark_throughput.py` 脚本进行测试。可以将当前文件夹 `benchmark_throughput.py` 脚本放在 `/root/autodl-tmp/` 目录下；或者也可以自行[下载最新版脚本](https://github.com/vllm-project/vllm/blob/main/benchmarks/benchmark_throughput.py)
+
+下面是一些 `benchmark_throughput.py` 脚本的参数说明：
+
+- `--model` 参数指定模型路径或名称。
+- `--backend` 推理后端，可以是 `vllm`、`hf` 和 `mii`。分布对应 `vLLM`、`HuggingFace` 和 `Mii` 推理后端。
+- `--input-len` 输入长度
+- `--output-len` 输出长度
+- `--num-prompts` 生成的 prompt 数量
+- `--seed` 随机种子
+- `--dtype` 数据类型
+- `--max-model-len` 模型最大长度
+- `--hf_max_batch_size` `transformers` 库的最大批处理大小（仅仅对于 `hf` 推理后端有效且为必填字段）
+- `--dataset` 数据集路径。（如未设置会自动生成数据）
+
+
+
+测试 `vLLM` 推理速度的命令和参数设置
+
+```bash
+python benchmark_throughput.py \
+	--model /root/autodl-tmp/qwen/DeepSeek-R1-Distill-Qwen-7B \
+	--backend vllm \
+	--input-len 64 \
+	--output-len 128 \
+	--num-prompts 25 \
+	--seed 2025 \
+  --dtype float16 \
+  --max-model-len 512
+```
+
+# Reference
+
+- https://github.com/datawhalechina/self-llm/blob/master/models/DeepSeek-R1-Distill-Qwen/
+- https://docs.vllm.ai/en/latest/api/offline_inference/llm.html
