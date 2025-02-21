@@ -3,68 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAGFlow 聊天界面</title>
+    <title>机构知识库</title>
     <style>
         body {
             margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+        }
+
+        .container {
             display: flex;
-            flex-direction: column;
             height: 100vh;
         }
 
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
+        .sidebar {
+            width: 300px;
+            background-color: #f4f4f4;
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 1px solid #ddd;
         }
 
-        .chat-container {
+        .sidebar h2 {
+            margin-top: 0;
+        }
+
+        .sidebar button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .iframe-container {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         iframe {
-            flex: 1;
             width: 100%;
+            height: 700px;
             border: none;
-            min-height: 600px;
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
         }
     </style>
 </head>
 <body>
-
-    <!-- 页面头部 -->
-    <header>
-        RAGFlow 聊天助手
-    </header>
-
-    <!-- 聊天内容区域 -->
-    <div class="chat-container">
-        <iframe
-            src="http://122.204.190.7:8380/chat/share?shared_id=ad54d9d2f02e11ef90fa0242ac120006&from=chat&auth=JlMjRlZDdhZjAzMjExZWZiOTBiMDI0Mm"
-            frameborder="0"
-        ></iframe>
+    <div class="container">
+        <div class="sidebar">
+            <h2>左侧边栏</h2>
+            <button onclick="alert('新建会话功能尚未实现')">新建会话</button>
+        </div>
+        <div class="iframe-container">
+            <h1>机构知识库</h1>
+            <iframe
+                src="http://122.204.190.7:8380/chat/share?shared_id=ad54d9d2f02e11ef90fa0242ac120006&from=chat&auth=JlMjRlZDdhZjAzMjExZWZiOTBiMDI0Mm"
+                style="width: 100%; height: 700px"
+                frameborder="0"
+            ></iframe>
+        </div>
     </div>
-
-    <!-- 页面底部 -->
-    <footer>
-        &copy; 2023 RAGFlow. All rights reserved.
-    </footer>
-
 </body>
 </html>
