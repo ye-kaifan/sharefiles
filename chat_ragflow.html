@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAGFlow 聊天界面</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            min-height: 600px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 页面头部 -->
+    <header>
+        RAGFlow 聊天助手
+    </header>
+
+    <!-- 聊天内容区域 -->
+    <div class="chat-container">
+        <iframe
+            src="http://122.204.190.7:8380/chat/share?shared_id=ad54d9d2f02e11ef90fa0242ac120006&from=chat&auth=JlMjRlZDdhZjAzMjExZWZiOTBiMDI0Mm"
+            frameborder="0"
+        ></iframe>
+    </div>
+
+    <!-- 页面底部 -->
+    <footer>
+        &copy; 2023 RAGFlow. All rights reserved.
+    </footer>
+
+</body>
+</html>
