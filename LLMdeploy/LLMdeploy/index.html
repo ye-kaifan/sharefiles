@@ -1,0 +1,1159 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://ye-kaifan.github.io/sharefiles/LLMdeploy/LLMdeploy/">
+      
+      
+        <link rel="prev" href="../../LLM4phys/trans4phys/">
+      
+      
+        <link rel="next" href="../../RAG/marker-pdf/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
+    
+    
+      
+        <title>本地部署LLM - Notes of Kai-Fan</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Notes of Kai-Fan" class="md-header__button md-logo" aria-label="Notes of Kai-Fan" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Notes of Kai-Fan
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              本地部署LLM
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Notes of Kai-Fan" class="md-nav__button md-logo" aria-label="Notes of Kai-Fan" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Notes of Kai-Fan
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Welcome
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    LLM4physics
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            LLM4physics
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LLM4phys/finetune/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    微调物理专家大模型
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LLM4phys/trans4lqcd/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transformer for LQCD
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LLM4phys/trans4phys/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transformer for physics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    本地部署LLM
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    本地部署LLM
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用的方案
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      可行的方案
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="可行的方案">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#graphrag" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphRAG
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fine-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fine-tuning
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    RAG
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            RAG
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../RAG/marker-pdf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    marker-pdf用法
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../RAG/ragflow_opt/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    RAGFlow调优策略
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      常用的方案
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      可行的方案
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="可行的方案">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#graphrag" class="md-nav__link">
+    <span class="md-ellipsis">
+      GraphRAG
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fine-tuning" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fine-tuning
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<ul>
+<li><a href="#给-llm-投喂物理知识">给 LLM 投喂物理知识</a></li>
+<li><a href="#常用的方案">常用的方案</a></li>
+<li><a href="#可行的方案">可行的方案</a><ul>
+<li><a href="#graphrag">GraphRAG</a></li>
+<li><a href="#fine-tuning">Fine-tuning</a></li>
+</ul>
+</li>
+<li><a href="#ccnu-nsc3-集群-vllm-本地部署-deepseek-r1">CCNU NSC3 集群 vLLM 本地部署 DeepSeek-R1</a></li>
+<li><a href="#vllm-简介">vLLM 简介</a><ul>
+<li><a href="#核心特性">核心特性</a></li>
+<li><a href="#安装条件">安装条件</a></li>
+</ul>
+</li>
+<li><a href="#vllm-安装方式一通过搭建-python-虚拟环境安装-vllm">vLLM 安装方式一：通过搭建 python 虚拟环境安装 vLLM</a><ul>
+<li><a href="#环境准备">环境准备</a></li>
+<li><a href="#模型下载">模型下载</a></li>
+<li><a href="#代码准备"><strong>代码准备</strong></a></li>
+<li><a href="#python脚本"><strong>Python脚本</strong></a></li>
+<li><a href="#创建兼容-openai-api-接口的服务器">创建兼容 OpenAI API 接口的服务器</a></li>
+<li><a href="#推理速度测试">推理速度测试</a></li>
+<li><a href="#vllm-reference">vLLM Reference</a></li>
+</ul>
+</li>
+<li><a href="#vllmsglang-安装方式二通过拉取官方的-docker-容器安装">vLLM/SGLang 安装方式二：通过拉取官方的 Docker 容器安装</a></li>
+<li><a href="#sglang-双节点部署">sglang 双节点部署</a></li>
+<li><a href="#节点1-gpu039">节点1 gpu039</a></li>
+<li><a href="#节点2-gpu040">节点2 gpu040</a></li>
+<li><a href="#sglang-官方">sglang 官方</a></li>
+<li><a href="#单一节点">单一节点</a></li>
+<li><a href="#api服务部署方式">API服务部署方式</a></li>
+<li><a href="#open-webui-部署">open-webui 部署</a></li>
+<li><a href="#curl">curl</a></li>
+</ul>
+<h1 id="llm">给 LLM 投喂物理知识</h1>
+<h2 id="_1">常用的方案</h2>
+<p>给大语言模型投喂 Lattice QCD 知识库，通常有如下三种方式：提示词（Prompt），检索增强生成（Retrieval-Augmented Generation，RAG），微调（Fine-tuning）。</p>
+<p>三种方式的实现原理对比：
+<img alt="" src="../figs/schematic3ways.png" /></p>
+<p>三种方式的优缺点对比：
+<img alt="" src="../figs/compare3ways.png" /></p>
+<p>图表来自：
+【如何给大模型喂数据？让AI更懂你～【小白科普】】 https://www.bilibili.com/video/BV1HS421R7oL/?share_source=copy_web&amp;vd_source=4b438f829d0c01700eb6160fae7d5ea7</p>
+<h2 id="_2">可行的方案</h2>
+<p>提示词的方式通常只支持128k上下文，显然没法胜任海量的知识库，剩下两种方式检索增强生成和微调倒是可行的。</p>
+<h3 id="graphrag">GraphRAG</h3>
+<p>本地安装微软开源 GraphRAG。GraphRAG优于传统的RAG，应该能够胜任对格点QCD知识的整理。</p>
+<ul>
+<li>优点是可以直接调用deepseek R1的API，性能强劲且便宜。</li>
+<li>缺点是微软的GraphRAG只支持txt和csv的文件格式。对于公式也是当作文本来处理，图片并不支持，需要预先处理，提取出图片中的文本信息。</li>
+</ul>
+<h3 id="fine-tuning">Fine-tuning</h3>
+<p>微调最大的困难在于数据准备，步骤如下：
+1. 收集物理领域数据：收集与特定物理领域相关的高质量数据，如物理学术论文、教科书、实验报告等。确保数据涵盖目标物理领域的核心概念和术语。
+2. 数据清洗和标注：对收集到的数据进行清洗，去除噪声和不相关的信息。根据需要对数据进行标注，例如标注物理公式、概念解释、实验步骤等。
+3. 数据格式化：将数据转换为模型可接受的格式，如JSONL文件，包含成对的问题和回答。</p>
+<p>准备好了用于微调的数据，还要在本地部署deepseek R1，能够本地部署的都是Qwen模型蒸馏deepseek R1得到的，性能远不如deepseek R1。</p>
+<h1 id="ccnu-nsc3-vllm-deepseek-r1">CCNU NSC3 集群 vLLM 本地部署 DeepSeek-R1</h1>
+<h2 id="vllm">vLLM 简介</h2>
+<p>vLLM 是伯克利大学 LMSYS 组织开源的大语言模型高速推理框架，旨在极大地提升实时场景下的语言模型服务的吞吐量与内存使用效率。</p>
+<h3 id="_3">核心特性</h3>
+<ul>
+<li><strong>高效的内存管理</strong>：通过 <code>PagedAttention</code> 算法，<code>vLLM</code> 实现了对 <code>KV</code> 缓存的高效管理，减少了内存浪费，优化了模型的运行效率。</li>
+<li><strong>高吞吐量</strong>：<code>vLLM</code> 支持异步处理和连续批处理请求，显著提高了模型推理的吞吐量，加速了文本生成和处理速度。与 Hugging Face Transformers 相比，vLLM 的吞吐量最多可以达到其 24 倍，文本生成推理（TGI）高出 3.5 倍，并且不需要对模型结构进行任何的改变。</li>
+<li><strong>内存效率</strong>：vLLM 实现了 KV 缓存内存几乎零浪费，解决了大语言模型推理中的内存管理瓶颈问题。</li>
+<li><strong>硬件兼容性</strong>：vLLM 不仅支持 NVIDIA GPU，还对 AMD GPU、Intel GPU、AWS Neuron 和 Google TPU 等市面上众多硬件架构敞开怀抱。</li>
+<li><strong>易用性</strong>：<code>vLLM</code> 与 <code>HuggingFace</code> 模型无缝集成，支持多种流行的大型语言模型，简化了模型部署和推理的过程。兼容 <code>OpenAI</code> 的 <code>API</code> 服务器。</li>
+<li><strong>分布式推理</strong>：框架支持在多 <code>GPU</code> 环境中进行分布式推理，通过模型并行策略和高效的数据通信，提升了处理大型模型的能力。</li>
+<li><strong>多步调度</strong>：vLLM 引入了多步调度技术，允许一次性完成多个步骤的调度和输入准备，使得 GPU 可以连续处理多个步骤而不必每个步骤都等待 CPU 指令，从而提高了 GPU 的利用率和整体吞吐量。</li>
+<li><strong>异步输出处理</strong>：vLLM 采用异步输出处理技术，使得输出处理与模型的执行可以并行进行，进一步提高了处理效率。</li>
+<li><strong>模型微调</strong>：vLLM 支持使用 LoRA（Low-Rank Adaptation）技术进行模型微调，这是一种用于高效微调预训练大模型的方法。</li>
+<li><strong>开源共享</strong>：<code>vLLM</code> 由于其开源的属性，拥有活跃的社区支持，这也便于开发者贡献和改进，共同推动技术发展。</li>
+</ul>
+<h3 id="_4">安装条件</h3>
+<ul>
+<li>vLLM 支持在 Linux 系统上运行。</li>
+<li>需要 Python 3.8-3.11 版本，CUDA 12.1。</li>
+<li>需要具有计算能力 7.0 或更高的 GPU（如 V100、T4、RTX 20xx、A100、L4、H100 等）。</li>
+</ul>
+<h2 id="vllm-python-vllm">vLLM 安装方式一：通过搭建 python 虚拟环境安装 vLLM</h2>
+<h3 id="_5">环境准备</h3>
+<p>本文基础环境如下：</p>
+<pre><code>----------------
+Centos 7.7
+python 3.12
+cuda 12.4
+CUDA DRIVER 550.54.14
+pytorch 2.5.1
+gcc 11
+g++ 11
+----------------
+</code></pre>
+<pre><code class="language-bash"># make a virtual environment first
+conda create -n cuda124_vllm python=3.12 -y
+module load cuda-12.4
+conda activate cuda124_vllm
+conda install -c conda-forge gcc=11
+conda install -c conda-forge gxx=11
+pip install torch
+pip install vllm
+</code></pre>
+<h3 id="_6">模型下载</h3>
+<p>使用 modelscope 中的 snapshot_download 函数下载模型，第一个参数为模型名称，参数 cache_dir 为模型的下载路径。</p>
+<p>新建 <code>model_download.py</code> 文件并在其中输入以下内容，粘贴代码后记得保存文件。</p>
+<pre><code class="language-python">from modelscope import snapshot_download
+
+model_dir = snapshot_download('deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B', cache_dir='/dssg/work/kfye/deepseek', revision='master')
+</code></pre>
+<p>然后在终端中输入 <code>python model_download.py</code> 执行下载，这里需要耐心等待一段时间直到模型下载完成。</p>
+<blockquote>
+<p>注意：记得修改 <code>cache_dir</code> 为你的模型下载路径哦~</p>
+</blockquote>
+<h3 id="_7"><strong>代码准备</strong></h3>
+<h4 id="python"><strong>Python脚本</strong></h4>
+<p>新建 <code>vllm_model.py</code> 文件并在其中输入以下内容，粘贴代码后请及时保存文件。下面的代码有很详细的注释，如有不理解的地方，欢迎大家提 <code>issue</code>。</p>
+<p>首先从 <code>vLLM</code> 库中导入 <code>LLM</code> 和 <code>SamplingParams</code> 类。<code>LLM</code> 类是使用 <code>vLLM</code> 引擎运行离线推理的主要类。<code>SamplingParams</code> 类指定采样过程的参数，用于控制和调整生成文本的随机性和多样性。</p>
+<p><code>vLLM</code> 提供了非常方便的封装，我们直接传入模型名称或模型路径即可，不必手动初始化模型和分词器。</p>
+<p>我们可以通过这个代码示例熟悉下 <code>vLLM</code> 引擎的使用方式。被注释的部分内容可以丰富模型的能力，但不是必要的，大家可以按需选择，自己多多动手尝试 ~</p>
+<pre><code class="language-python"># vllm_model.py
+from vllm import LLM, SamplingParams
+from transformers import AutoTokenizer
+import os
+import json
+
+# 自动下载模型时，指定使用modelscope; 否则，会从HuggingFace下载
+os.environ['VLLM_USE_MODELSCOPE']='True'
+
+def get_completion(prompts, model, tokenizer=None, max_tokens=8192, temperature=0.6, top_p=0.95, max_model_len=2048):
+    stop_token_ids = [151329, 151336, 151338]
+    # 创建采样参数。temperature 控制生成文本的多样性，top_p 控制核心采样的概率
+    sampling_params = SamplingParams(temperature=temperature, top_p=top_p, max_tokens=max_tokens, stop_token_ids=stop_token_ids)
+    # 初始化 vLLM 推理引擎
+    llm = LLM(model=model, tokenizer=tokenizer, max_model_len=max_model_len,trust_remote_code=True)
+    outputs = llm.generate(prompts, sampling_params)
+    return outputs
+
+
+if __name__ == &quot;__main__&quot;:    
+    # 初始化 vLLM 推理引擎
+    model='/dssg/work/kfye/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B' # 指定模型路径
+    # model=&quot;deepseek-ai/DeepSeek-R1-Distill-Qwen-7B&quot; # 指定模型名称，自动下载模型
+    tokenizer = None
+    # 加载分词器后传入vLLM 模型，但不是必要的。
+    # tokenizer = AutoTokenizer.from_pretrained(model, use_fast=False) 
+
+    text = [&quot;Please introduce Pade approximants for me. Please reason step by step, and put your final answer within \boxed{}.&lt;think&gt;\n&quot;, ] # 可用 List 同时传入多个 prompt，根据 DeepSeek 官方的建议，每个 prompt 都需要以 &lt;think&gt;\n 结尾，如果是数学推理内容，建议包含（中英文皆可）：Please reason step by step, and put your final answer within \boxed{}.
+
+    # messages = [
+    #     {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt+&quot;&lt;think&gt;\n&quot;}
+    # ]
+    # 作为聊天模板的消息，不是必要的。
+    # text = tokenizer.apply_chat_template(
+    #     messages,
+    #     tokenize=False,
+    #     add_generation_prompt=True
+    # )
+
+    outputs = get_completion(text, model, tokenizer=tokenizer, max_tokens=8192, temperature=0.6, top_p=0.95, max_model_len=2048) # 思考需要输出更多的 Token 数，max_tokens 设为 8K，根据 DeepSeek 官方的建议，temperature应在 0.5-0.7，推荐 0.6
+
+    # 输出是一个包含 prompt、生成文本和其他信息的 RequestOutput 对象列表。
+    # 打印输出。
+    for output in outputs:
+        prompt = output.prompt
+        generated_text = output.outputs[0].text
+        if r&quot;&lt;/think&gt;&quot; in generated_text:
+            think_content, answer_content = generated_text.split(r&quot;&lt;/think&gt;&quot;)
+        else:
+            think_content = &quot;&quot;
+            answer_content = generated_text
+        print(f&quot;Prompt: {prompt!r}, Think: {think_content!r}, Answer: {answer_content!r}&quot;)
+</code></pre>
+<p>运行代码</p>
+<pre><code class="language-bash">python vllm_model.py
+</code></pre>
+<h4 id="openai-api">创建兼容 OpenAI API 接口的服务器</h4>
+<p><code>DeepSeek-R1-Distill-Qwen</code> 兼容 <code>OpenAI API</code> 协议，所以我们可以直接使用 <code>vLLM</code> 创建 <code>OpenAI API</code> 服务器。<code>vLLM</code> 部署实现 <code>OpenAI API</code> 协议的服务器非常方便。默认会在 http://localhost:8000 启动服务器。服务器当前一次托管一个模型，并实现列表模型、<code>completions</code> 和 <code>chat completions</code> 端口。</p>
+<ul>
+<li><code>completions</code>：是基本的文本生成任务，模型会在给定的提示后生成一段文本。这种类型的任务通常用于生成文章、故事、邮件等。</li>
+<li><code>chat completions</code>：是面向对话的任务，模型需要理解和生成对话。这种类型的任务通常用于构建聊天机器人或者对话系统。</li>
+</ul>
+<p>在创建服务器时，我们可以指定模型名称、模型路径、聊天模板等参数。</p>
+<ul>
+<li><code>--host</code> 和 <code>--port</code> 参数指定地址。</li>
+<li><code>--model</code> 参数指定模型名称。</li>
+<li><code>--chat-template</code> 参数指定聊天模板。</li>
+<li><code>--served-model-name</code> 指定服务模型的名称。</li>
+<li><code>--max-model-len</code> 指定模型的最大长度。</li>
+</ul>
+<pre><code class="language-bash">conda activate cuda124_vllm
+python -m vllm.entrypoints.openai.api_server --model /dssg/work/kfye/deepseek/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --served-model-name deepseekr1-qwen-1.5b --tensor-parallel-size 8 --max-model-len 2048
+python -m vllm.entrypoints.openai.api_server --model /dssg/work/kfye/deepseek/deepseek-ai/DeepSeek-R1-Distill-Llama-70B --served-model-name deepseekr1-Llama-70b --tensor-parallel-size 8 --max-model-len 2048
+</code></pre>
+<ul>
+<li>通过 <code>curl</code> 命令查看当前的模型列表</li>
+</ul>
+<pre><code class="language-bash">curl http://localhost:8000/v1/models
+</code></pre>
+<ul>
+<li>使用 <code>curl</code> 命令测试 <code>OpenAI Completions API</code> </li>
+</ul>
+<pre><code class="language-bash">curl http://localhost:8000/v1/completions \
+    -H &quot;Content-Type: application/json&quot; \
+    -d '{
+        &quot;model&quot;: &quot;DeepSeek-R1-Distill-Qwen-7B&quot;,
+        &quot;prompt&quot;: &quot;我想问你，5的阶乘是多少？&lt;think&gt;\n&quot;,
+        &quot;max_tokens&quot;: 1024,
+        &quot;temperature&quot;: 0
+    }'
+</code></pre>
+<ul>
+<li>用 <code>Python</code> 脚本请求 <code>OpenAI Completions API</code> </li>
+</ul>
+<pre><code class="language-python"># vllm_openai_completions.py
+from openai import OpenAI
+client = OpenAI(
+    base_url=&quot;http://localhost:8000/v1&quot;,
+    api_key=&quot;empty&quot;, # 随便填写，只是为了通过接口参数校验
+)
+
+completion = client.chat.completions.create(
+  model=&quot;deepseek-qwen-1.5b&quot;,
+  messages=[
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;我想问你，5的阶乘是多少？&lt;think&gt;\n&quot;}
+  ]
+)
+
+print(completion.choices[0].message)
+</code></pre>
+<pre><code class="language-shell">python vllm_openai_completions.py
+</code></pre>
+<ul>
+<li><code>request</code>方式</li>
+</ul>
+<pre><code class="language-python"># chat_vllm_api.py
+import requests
+
+headers = {
+    &quot;Content-Type&quot;: &quot;application/json&quot;,
+}
+
+URL = &quot;http://localhost:8000/v1/chat/completions&quot;
+
+prompt = {
+    &quot;model&quot;: &quot;deepseek-qwen-1.5b&quot;,
+    &quot;messages&quot;: [
+        {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a large model that excels at mathematical and physical reasoning.&quot;},
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Please introduce Pade approximants for me. Please reason step by step, and put your final answer within \boxed{}.&quot;}
+    ],
+    &quot;temperature&quot;: 0.6,
+    &quot;top_p&quot;: 0.95
+}
+
+resp = requests.post(URL, headers=headers, json=prompt, stream=False)
+rep = resp.json()
+print(rep)
+</code></pre>
+<ul>
+<li>用 <code>Python</code> 脚本请求 <code>OpenAI Chat Completions API</code> </li>
+</ul>
+<pre><code class="language-python"># vllm_openai_chat_completions.py
+from openai import OpenAI
+openai_api_key = &quot;empty&quot; # 随便填写，只是为了通过接口参数校验
+openai_api_base = &quot;http://localhost:8000/v1&quot;
+
+client = OpenAI(
+    api_key=openai_api_key,
+    base_url=openai_api_base,
+)
+
+chat_outputs = client.chat.completions.create(
+    model=&quot;deepseek-qwen-1.5b&quot;,
+    messages=[
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;什么是深度学习？&quot;},
+    ]
+)
+print(chat_outputs)
+</code></pre>
+<pre><code class="language-shell">python vllm_openai_chat_completions.py
+</code></pre>
+<h3 id="_8">推理速度测试</h3>
+<p>既然 <code>vLLM</code> 是一个高效的大型语言模型推理和部署服务系统，那么我们不妨就测试一下模型的回复生成速度。看看和原始的速度相比有多大的提升。这里直接使用 <code>vLLM</code> 自带的 <code>benchmark_throughput.py</code> 脚本进行测试。可以将当前文件夹 <code>benchmark_throughput.py</code> 脚本放在 <code>/root/autodl-tmp/</code> 目录下；或者也可以自行<a href="https://github.com/vllm-project/vllm/blob/main/benchmarks/benchmark_throughput.py">下载最新版脚本</a></p>
+<p>下面是一些 <code>benchmark_throughput.py</code> 脚本的参数说明：</p>
+<ul>
+<li><code>--model</code> 参数指定模型路径或名称。</li>
+<li><code>--backend</code> 推理后端，可以是 <code>vllm</code>、<code>hf</code> 和 <code>mii</code>。分布对应 <code>vLLM</code>、<code>HuggingFace</code> 和 <code>Mii</code> 推理后端。</li>
+<li><code>--input-len</code> 输入长度</li>
+<li><code>--output-len</code> 输出长度</li>
+<li><code>--num-prompts</code> 生成的 prompt 数量</li>
+<li><code>--seed</code> 随机种子</li>
+<li><code>--dtype</code> 数据类型</li>
+<li><code>--max-model-len</code> 模型最大长度</li>
+<li><code>--hf_max_batch_size</code> <code>transformers</code> 库的最大批处理大小（仅仅对于 <code>hf</code> 推理后端有效且为必填字段）</li>
+<li><code>--dataset</code> 数据集路径。（如未设置会自动生成数据）</li>
+</ul>
+<p>测试 <code>vLLM</code> 推理速度的命令和参数设置</p>
+<pre><code class="language-bash">python benchmark_throughput.py \
+    --model /root/autodl-tmp/qwen/DeepSeek-R1-Distill-Qwen-7B \
+    --backend vllm \
+    --input-len 64 \
+    --output-len 128 \
+    --num-prompts 25 \
+    --seed 2025 \
+  --dtype float16 \
+  --max-model-len 512
+</code></pre>
+<h3 id="vllm-reference">vLLM Reference</h3>
+<ul>
+<li>https://github.com/datawhalechina/self-llm/blob/master/models/DeepSeek-R1-Distill-Qwen/</li>
+<li>https://docs.vllm.ai/en/latest/api/offline_inference/llm.html</li>
+</ul>
+<h2 id="vllmsglang-docker">vLLM/SGLang 安装方式二：通过拉取官方的 Docker 容器安装</h2>
+<p>在GPU上运行的话需要在GPU节点安装 docker 和 nvidia-container-toolkit，安装需要管理员权限。</p>
+<p>由于<code>DockerHub</code>是国外网站，直接运行下面的命令会报错，</p>
+<pre><code class="language-bash">docker pull vllm/vllm-openai
+</code></pre>
+<p>换成国内镜像源才能顺利下载，</p>
+<pre><code class="language-bash">docker pull docker.1ms.run/vllm/vllm-openai
+docker pull docker.1ms.run/lmsysorg/sglang:latest
+docker pull docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124
+docker pull docker.1ms.run/dyrnq/open-webui
+docker pull docker.1ms.run/savatar101/marker-api
+docker pull docker.1ms.run/anetaco/marker:v108
+docker pull registry.cn-beijing.aliyuncs.com/anetaco/marker:v108
+docker pull registry.cn-beijing.aliyuncs.com/quincyqiang/mineru:0.1-models
+docker pull registry.cn-beijing.aliyuncs.com/savatar101/marker-api
+</code></pre>
+<blockquote>
+<p>镜像源的网址经常换，需要自己搜索<code>DockerHub 国内镜像源</code>寻找可用的镜像源网址，用法类似。</p>
+</blockquote>
+<p>ln02节点</p>
+<pre><code class="language-bash">docker save -o /dssg/work/kfye/docker/images_tar/vllm0.7.2.tar docker.1ms.run/vllm/vllm-openai
+docker save -o /dssg/work/kfye/docker/images_tar/sglang0.4.2.post4-cu124.tar docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124
+</code></pre>
+<p>gpu039节点</p>
+<pre><code class="language-bash">docker load -i /dssg/work/kfye/docker/images_tar/vllm0.7.2.tar
+docker load -i /dssg/work/kfye/docker/images_tar/sglang0.4.2.post4-cu124.tar
+</code></pre>
+<h1 id="sglang">sglang 双节点部署</h1>
+<p>程序员阿赞</p>
+<h2 id="1-gpu039">节点1 gpu039</h2>
+<pre><code class="language-bash">docker run --gpus all \
+    --shm-size 10g \
+    --network=host \
+    -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --name sglang2a \
+    -p 1234:1234 -d \
+    --ipc=host --restart always \
+    docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1 --served-model-name deepseek-r1 --tp 16 --dist-init-addr 11.11.11.39:4321 --nnodes 2 --node-rank 0 --trust-remote-code --host 0.0.0.0 --port 1234
+</code></pre>
+<h2 id="2-gpu040">节点2 gpu040</h2>
+<pre><code class="language-bash">docker run --gpus all \
+    --shm-size 10g \
+    --network=host \
+    -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --name sglang2a \
+    -p 1234:1234 -d \
+    --ipc=host --restart always \
+    docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1 --served-model-name deepseek-r1 --tp 16 --dist-init-addr 11.11.11.39:4321 --nnodes 2 --node-rank 1 --trust-remote-code --host 0.0.0.0 --port 1234
+</code></pre>
+<p>optional</p>
+<pre><code class="language-bash">--privileged -e NCCL_IB_HCA=mlx5_1,mlx5_2,mlx5_3,mlx5_4,mlx5_5,mlx5_6,mlx5_7,mlx5_8 -e NCCL_P2P_LEVEL=NVL -e NCCL_IB_GID_INDEX=0  -e NCCL_IB_CUDA_SUPPORT=1 -e library/NCCL_IB_DISABLE=0 -e NCCL_SOCKET_IFNAME=ibs11,ibs12,ibs13,ibs14,ibs15,ibs16,ibs17,ibs18 -e NCCL_DEBUG=INFO -e NCCL_NET_GDR_LEVEL=2 \
+--privileged -e NCCL_IB_HCA=mlx5_1,mlx5_2,mlx5_3,mlx5_4,mlx5_5,mlx5_6,mlx5_7,mlx5_8 -e NCCL_P2P_LEVEL=NVL -e NCCL_IB_GID_INDEX=0  -e NCCL_IB_CUDA_SUPPORT=1 -e NCCL_IB_DISABLE=0 -e NCCL_SOCKET_IFNAME=ibs11,ibs12,ibs13,ibs14,ibs15,ibs16,ibs17,ibs18 -e NCCL_DEBUG=INFO -e NCCL_NET_GDR_LEVEL=2 \
+</code></pre>
+<h2 id="sglang_1">sglang 官方</h2>
+<pre><code class="language-bash">docker run --gpus all \
+    --shm-size 32g \
+    --network=host \
+    -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --name sglang1 \
+    -it \
+    --rm \
+    --ipc=host \
+    docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1 --tp 16 --dist-init-addr 10.10.10.39:20000 --nnodes 2 --node-rank 1 --trust-remote-code --host 0.0.0.0 --port 40000 --output-file &quot;deepseekr1.jsonl&quot;
+
+</code></pre>
+<h2 id="_9">单一节点</h2>
+<pre><code class="language-bash"># gpu039
+docker run --gpus all --shm-size 10g --name sglang1b \
+    -p 22:22 -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --ipc=host docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1-Distill-Llama-70B --tp 8 --trust-remote-code --host 11.11.11.39 --port 22
+docker: Error response from daemon: driver failed programming external connectivity on endpoint sglang1b (265c3c57cc5f76d4304a66097f4e000a415bb9f7fcf440123246a7766ca1f0dd): failed to bind port 0.0.0.0:22/tcp: Error starting userland proxy: listen tcp4 0.0.0.0:22: bind: address already in use.
+
+docker run --gpus all --shm-size 10g --name sglang1a \
+    -p 1234:1234 -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --ipc=host docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1-Distill-Llama-70B --tp 8 --trust-remote-code --host 11.11.11.39 --port 1234
+[2025-02-17 11:07:35] ERROR:    [Errno 99] error while attempting to bind on address ('11.11.11.39', 1234): cannot assign requested address
+
+docker run --gpus all --shm-size 10g --name sglang1a \
+    -p 22:4321 -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --ipc=host docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1-Distill-Llama-70B --tp 8 --trust-remote-code --host 11.11.11.39 --port 4321
+
+docker run --gpus all --shm-size 10g --name sglang1d \
+    -p 1234:1234 -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --network host --ipc=host docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1-Distill-Llama-70B --tp 8 --trust-remote-code --host 11.11.11.39 --port 1234
+已经在gpu039节点成功部署。
+部署qwen-32b
+docker cp /dssg/work/kfye/qwen/qwen32b sglang_gpu4:/sgl-workspace/
+CUDA_VISIBLE_DEVICES=6,7 python3 -m sglang.launch_server --model-path /sgl-workspace/qwen32b --served-model-name qwen-32b --tp 2 --trust-remote-code --host 0.0.0.0 --port 1234
+
+
+docker run --gpus all --shm-size 32g --name sglang_gpu4 -itd \
+    -v /dssg/work/kfye/deepseek/deepseek-ai/DeepSeek-R1-Distill-Llama-70B:/sgl-workspace/DeepSeek-R1-Distill-Llama-70B \
+    -v /dssg/work/kfye/deepseek/deepseek-ai/pychat:/sgl-workspace/pychat \
+    --network host --ipc=host docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124
+
+# gpu040
+docker run --gpus all --shm-size 10g --name sglang1b \
+    -p 1234:1234 -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --ipc=host docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1-Distill-Llama-70B --tp 8 --trust-remote-code --host 11.11.11.40 --port 1234
+[2025-02-17 10:22:33] ERROR:    [Errno 99] error while attempting to bind on address ('11.11.11.40', 1234): cannot assign requested address
+
+docker run --gpus all --shm-size 10g --name sglang1c \
+    -p 1234:1234 -v /dssg/work/kfye/deepseek/deepseek-ai:/sgl-workspace/deepseek-ai \
+    --network host --ipc=host docker.1ms.run/lmsysorg/sglang:v0.4.2.post4-cu124 \
+    python3 -m sglang.launch_server --model-path /sgl-workspace/deepseek-ai/DeepSeek-R1-Distill-Llama-70B --tp 8 --trust-remote-code --host 11.11.11.40 --port 1234
+</code></pre>
+<h2 id="api">API服务部署方式</h2>
+<pre><code class="language-bash">在gpu039节点:
+docker ps -a
+docker start sglang1a
+nvidia-smi # 直到gpu显存利用率达到90%左右就是api服务部署完成了
+docker logs sglang1a # 报错不用管，是上次 docker stop sglang1a 带来的，等一会就会出现加载模型的信息，需要十几分钟
+docker cp /dssg/work/kfye/deepseek/openai_chat_completion_streaming.py sglang2:/sgl-workspace/
+docker exec -it sglang1a bash
+python3 openai_chat_completion_streaming.py
+</code></pre>
+<h1 id="open-webui">open-webui 部署</h1>
+<p>由于<code>DockerHub</code>是国外网站，直接运行下面的命令会报错，</p>
+<pre><code class="language-bash">docker pull vllm/vllm-openai
+</code></pre>
+<p>换成国内镜像源才能顺利下载，</p>
+<pre><code class="language-bash">docker pull docker.1ms.run/dyrnq/open-webui
+</code></pre>
+<blockquote>
+<p>镜像源的网址经常换，需要自己搜索<code>DockerHub 国内镜像源</code>寻找可用的镜像源网址，用法类似。</p>
+</blockquote>
+<pre><code class="language-bash">docker save -o /dssg/work/kfye/docker/images_tar/openwebui.tar docker.1ms.run/dyrnq/open-webui
+docker load -i /dssg/work/kfye/docker/images_tar/openwebui.tar
+docker run -d -p 1234:8080 -v open-webui:/app/backend/data --name open-webui docker.1ms.run/dyrnq/open-webui
+</code></pre>
+<h1 id="curl">curl</h1>
+<pre><code class="language-bash">curl http://122.204.190.7:5678/v1/chat/completions \
+curl http://122.204.190.7:8555/v1/chat/completions \
+curl http://122.204.190.7:1234/v1/chat/completions \
+-H &quot;Content-Type: application/json&quot; \
+-d '{
+    &quot;model&quot;: &quot;qwen-32b&quot;,
+    &quot;messages&quot;: [
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Why the sky is blue?\n&quot;}
+    ]
+}'
+
+
+&quot;model&quot;: &quot;minicpm-v:8b-2.6-fp16&quot;,
+&quot;model&quot;: &quot;DeepSeek-R1-Distill-Llama-70B&quot;,
+&quot;model&quot;: &quot;deepseek-r1-70b:latest&quot;,
+
+
+curl http://11.11.11.40:11434/v1/chat/completions \
+curl http://11.11.11.39:1234/v1/chat/completions \
+-H &quot;Content-Type: application/json&quot; \
+-d '{
+    &quot;model&quot;: &quot;qwen-32b&quot;,
+    &quot;messages&quot;: [
+        {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Why the sky is blue?&lt;think&gt;\n&quot;}
+    ]
+}'
+
+curl http://127.0.0.1:11434/api/chat -d '{
+curl http://localhost:11434/api/chat -d '{
+curl http://11.11.11.40:11434/api/chat -d '{
+curl http://122.204.190.7:11434/api/chat -d '{
+  &quot;model&quot;: &quot;qwen2.5:7b-instruct-120k&quot;,
+  &quot;messages&quot;: [
+    { &quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;why is the sky blue?&quot; }
+  ],
+  &quot;stream&quot;: false
+}'
+
+
+curl --request POST \
+     --url http://122.204.190.7:8380/api/v1/chats/ad54d9d2f02e11ef90fa0242ac120006/sessions \
+     --header 'Content-Type: application/json' \
+     --header 'Authorization: Bearer ragflow-JlMjRkOWYyZjAzMjExZWZiOTBiMDI0Mm' \
+     --data '{
+    &quot;name&quot;:&quot;new_chat_1&quot;
+}'
+
+curl --request POST \
+     --url http://122.204.190.7:8380/api/v1/chats/ad54d9d2f02e11ef90fa0242ac120006/sessions \
+     --header 'Content-Type: application/json' \
+     --header 'Authorization: Bearer ragflow-JlMjRkOWYyZjAzMjExZWZiOTBiMDI0Mm' \
+     --data-binary '
+     {
+          &quot;name&quot;:&quot;new_chat_1&quot;
+          &quot;question&quot;: &quot;Who are you&quot;,
+          &quot;stream&quot;: true,
+     }'
+
+&quot;session_id&quot;:&quot;9fa7691cb85c11ef9c5f0242ac120005&quot;
+&quot;dataset_ids&quot;: [&quot;0b2cbc8c877f11ef89070242ac120005&quot;],
+
+ad54d9d2f02e11ef90fa0242ac120006
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>

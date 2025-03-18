@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://ye-kaifan.github.io/sharefiles/</loc>
+         <lastmod>2025-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://ye-kaifan.github.io/sharefiles/LLM4phys/finetune/</loc>
+         <lastmod>2025-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://ye-kaifan.github.io/sharefiles/LLM4phys/trans4lqcd/</loc>
+         <lastmod>2025-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://ye-kaifan.github.io/sharefiles/LLM4phys/trans4phys/</loc>
+         <lastmod>2025-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://ye-kaifan.github.io/sharefiles/LLMdeploy/LLMdeploy/</loc>
+         <lastmod>2025-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://ye-kaifan.github.io/sharefiles/RAG/marker-pdf/</loc>
+         <lastmod>2025-03-18</lastmod>
+    </url>
+    <url>
+         <loc>https://ye-kaifan.github.io/sharefiles/RAG/ragflow_opt/</loc>
+         <lastmod>2025-03-18</lastmod>
+    </url>
+</urlset>
