@@ -1,4 +1,4 @@
-# Welcome to Kai-Fan blogs
+# Welcome to Kai-Fan's blogs
 
 - 通过主题和目录浏览文章。
   - 电脑端：在上方标签栏选择主题，在左侧目录选择文章。

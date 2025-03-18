@@ -2,3 +2,16 @@ site_name: Notes of Kai-Fan
 site_url: https://ye-kaifan.github.io/sharefiles/
 theme:
   name: material
+
+# [Navigtion]
+nav:
+  - Welcome: index.md
+  - LLM4physics:
+    - 微调物理专家大模型: LLM4phys/finetune.md
+    - Transformer for LQCD: LLM4phys/trans4lqcd.md
+    - Transformer for physics: LLM4phys/trans4phys.md
+  - 本地部署LLM: LLMdeploy/LLMdeploy.md
+  - RAG:
+    - marker-pdf用法: RAG/marker-pdf.md
+    - RAGFlow调优策略: RAG/ragflow_opt.md
+
