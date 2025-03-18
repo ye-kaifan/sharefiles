@@ -1,7 +1,8 @@
 
 - [什么是大语言模型？](#什么是大语言模型)
   - [Transformer 的原理](#transformer-的原理)
-- [使用 Transformer 来学习物理的语言 （比如时间序列的马尔可夫链）](#使用-transformer-来学习物理的语言-比如时间序列的马尔可夫链)
+- [使用 Transformer 来学习物理的语言 （比如马尔可夫链）](#使用-transformer-来学习物理的语言-比如马尔可夫链)
+  - [Rapid detection of phase transitions from Monte Carlo samples before equilibrium](#rapid-detection-of-phase-transitions-from-monte-carlo-samples-before-equilibrium)
   - [CASK: A Gauge Covariant Transformer for Lattice Gauge Theory](#cask-a-gauge-covariant-transformer-for-lattice-gauge-theory)
   - [Self-learning Monte Carlo with equivariant Transformer](#self-learning-monte-carlo-with-equivariant-transformer)
   - [Equivariant Transformer is all you need](#equivariant-transformer-is-all-you-need)
@@ -19,11 +20,12 @@
 
 大语言模型在很大程度上代表了一类名为Transformer网络的深度学习架构。Transformer模型是一种神经网络，通过追踪序列数据 (如本句中的单词) 中的关系学习上下文及其含义。
 
-![](../figs/LLM4phys/deeplearning4phys.png){width=80%}
+![](figs/deeplearning4phys.png){width=80%}
+[图片来源](https://indico.ihep.ac.cn/event/20002/contributions/136439/attachments/71259/86251/AI%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9C%A8%E9%AB%98%E8%83%BD%E7%89%A9%E7%90%86%E9%A2%86%E5%9F%9F%E7%9A%84%E5%BA%94%E7%94%A8.pdf)
 
 Transformer由多个Transformer块 (也称为层) 组成。例如，Transformer具有自注意层、前馈层和归一化层，所有这些层协同发挥作用来解密输入内容，以便在推理时预测输出流。这些层可以进行堆叠，形成更深层的Transformer和强大的语言模型。Transformer最早由 Google 在 2017 年的论文“Attention Is All You Need”中提出。
 
-![](../figs/LLM4phys/llm-how-it-works-chart.svg){width=80%}
+![](figs/llm-how-it-works-chart.svg){width=80%}
 <p align="center">图 1: 转换器模型的工作原理。</p>
 
 有两项关键创新使得Transformer特别适合大语言模型：位置编码（Positional Encoding）和自注意力机制（Self-Attention）。
@@ -46,7 +48,15 @@ Transformer tutorials:
 - https://github.com/tensorflow/tensor2tensor
 
 
-# 使用 Transformer 来学习物理的语言 （比如时间序列的马尔可夫链）
+# 使用 Transformer 来学习物理的语言 （比如马尔可夫链）
+
+Transformer 能够学习任何序列，在自然语言领域，序列就是一段文字，在物理领域，序列可以是一条马尔可夫链。
+
+## Rapid detection of phase transitions from Monte Carlo samples before equilibrium
+
+- https://arxiv.org/abs/2206.13137
+
+传统蒙特卡洛模拟在相变研究中面临计算复杂度高、需长时间平衡采样的瓶颈问题。针对这一挑战，丁洁伟、唐浩金和余永基研究团队提出了一种融合深度学习的创新范式。该方法创新性地采用基于Transformer架构的深度学习模型，直接从系统未达到热力学平衡的蒙特卡洛组态样本中提取有效特征，实现了对相变临界温度的高精度预测。研究结果表明，双向长短期记忆网络和Transformer架构能够通过解析经典自旋系统的构型分布以及量子系统的格林函数等多元数据特征，在系统未达到热力学平衡的蒙特卡洛组态样本中学习并完成不同物相的分类识别，并以高精度定位相变临界点。
 
 ## CASK: A Gauge Covariant Transformer for Lattice Gauge Theory
 
@@ -83,7 +93,7 @@ Transformer tutorials:
 
 为了使此类动力系统的建模适用于现代机器学习架构的使用，连续解在空间和时间域上被离散化，使得微分方程的解为 $\Phi = \left( \phi_0, \phi_1, \ldots, \phi_T \right)$；其中 $\phi_i \in \mathbb{R}^{n \times d}$，且 $\phi_i$ 在 $\Omega$ 上被 $d$ 个点离散化。我们假设初始状态为 $\phi_0$，并且时间区间 $\mathcal{T}$ 被 $T$ 个时间步离散化，时间步长为 $\Delta t$。因此，我们将动力系统的建模问题转化为一个时间序列问题。所提出的机器学习方法有两个核心组件：用于建模动力学的Transformer和用于将物理状态投影为向量表示的嵌入网络。与自然语言处理（NLP）类似，嵌入模型在Transformer之前进行训练。然后，该嵌入模型被冻结，整个数据集被转换为嵌入空间，随后在嵌入空间中训练Transformer，如图1所示。在测试期间，嵌入解码器用于从Transformer的预测中重建物理状态。
 
-![](../figs/LLM4phys/training.png){width=80%}
+![](figs/training.png){width=80%}
 <p align="center">图 2: 使用变压器建模物理动力学的两个训练阶段。（从左到右）首先使用 Koopman 动力学训练嵌入模型。然后冻结（固定）嵌入模型，将所有训练数据嵌入，并在嵌入空间中训练变压器。</p>
 
 ## 使用 Transformer 来学习分子和蛋白质的语言的案例
@@ -98,7 +108,7 @@ https://arxiv.org/abs/2401.14656
 
 如图所示，科学大语言模型在多个模态上运行，包括文本、分子、蛋白质和基因组数据，多模态方法位于这些领域的交汇处。与主要在自然语言文本上训练的通用目的模型不同，科学大语言模型必须理解科学的独特“语言”，包括专门的符号系统（如分子的 SMILES）和生物序列中发现的复杂模式。
 
-![](../figs/LLM4phys/scillm.png){width=80%}
+![](figs/scillm.png){width=80%}
 <p align="center">图 3: 本调查中科学大型语言模型（Sci-LLMs）的研究范围。我们关注科学语言（即文本、分子、蛋白质和基因组语言），以及它们在生化科学领域的组合（即多模态语言）。</p>
 
 #### 核心观点

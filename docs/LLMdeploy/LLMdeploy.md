@@ -32,10 +32,10 @@
 给大语言模型投喂 Lattice QCD 知识库，通常有如下三种方式：提示词（Prompt），检索增强生成（Retrieval-Augmented Generation，RAG），微调（Fine-tuning）。
 
 三种方式的实现原理对比：
-![](../figs/LLMdeploy/schematic3ways.png)
+![](figs/schematic3ways.png)
 
 三种方式的优缺点对比：
-![](../figs/LLMdeploy/compare3ways.png)
+![](figs/compare3ways.png)
 
 图表来自：
 【如何给大模型喂数据？让AI更懂你～【小白科普】】 https://www.bilibili.com/video/BV1HS421R7oL/?share_source=copy_web&vd_source=4b438f829d0c01700eb6160fae7d5ea7
